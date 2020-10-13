@@ -9,13 +9,21 @@ using namespace std;
 bool loadDeliveryRequests(string deliveriesFile, GeoCoord& depot, vector<DeliveryRequest>& v);
 bool parseDelivery(string line, string& lat, string& lon, string& item);
 
-int main()
-{
-	StreetMap sm;
-	sm.load("D:/UCLA/CS/CS32/Project4_GooberEats/Project4_GooberEats/mapdata.txt");
-}
+//int main()
+//{
+//	StreetMap sm;
+//	sm.load("D:/UCLA/CS/CS32/LetvinDrew_GooberEats/Project4_GooberEats/Project4_GooberEats/mapdata.txt");
+//	vector<StreetSegment> test;
+//	GeoCoord depot("3", "1");
+//	vector<DeliveryRequest> deliveries;
+//	vector<DeliveryCommand> dcs;
+//	loadDeliveryRequests("D:/UCLA/CS/CS32/LetvinDrew_GooberEats/Project4_GooberEats/Project4_GooberEats/deliveries.txt", depot, deliveries);
+//	DeliveryPlanner dp(&sm);
+//	double totalMiles;
+//    DeliveryResult result = dp.generateDeliveryPlan(depot, deliveries, dcs, totalMiles);
+//}
 
-/*
+
 int main(int argc, char *argv[])
 {
     if (argc != 3)
@@ -64,7 +72,7 @@ int main(int argc, char *argv[])
     cout.precision(2);
     cout << totalMiles << " miles travelled for all deliveries." << endl;
 }
-*/
+
 bool loadDeliveryRequests(string deliveriesFile, GeoCoord& depot, vector<DeliveryRequest>& v)
 {
     ifstream inf(deliveriesFile);

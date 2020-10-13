@@ -18,6 +18,8 @@
     <Text Include="deliveries.txt" />
     <Text Include="mapdata.txt" />
     <Text Include="testMap.txt" />
+    <Text Include="testDeliveries.txt" />
+    <Text Include="report.txt" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DeliveryOptimizer.cpp">

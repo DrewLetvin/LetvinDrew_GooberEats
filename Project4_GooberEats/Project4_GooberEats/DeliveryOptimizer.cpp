@@ -28,8 +28,33 @@ void DeliveryOptimizerImpl::optimizeDeliveryOrder(
     double& oldCrowDistance,
     double& newCrowDistance) const
 {
-    oldCrowDistance = 0;  // Delete these lines and implement this function correctly
+    oldCrowDistance = 0;
     newCrowDistance = 0;
+
+	//vector<DeliveryRequest> toVisit;
+	//vector<DeliveryRequest> visited;
+
+	//for (int j = 0; j < deliveries.size(); j++)
+	//{
+	//	toVisit.push_back(deliveries[j]);
+	//}
+
+	oldCrowDistance += distanceEarthMiles(depot, deliveries[0].location);
+	for (int i = 0; i < deliveries.size() - 1; i++)
+	{
+		oldCrowDistance += distanceEarthMiles(deliveries[i].location, deliveries[i + 1].location);
+	}
+	oldCrowDistance += distanceEarthMiles(deliveries[deliveries.size() - 1].location, depot);
+
+
+	//DeliveryRequest current("current", depot);
+	//current = toVisit[0];
+	//for (int k = 0; k < toVisit.size(); k++)
+	//{
+
+	//}
+
+	newCrowDistance = oldCrowDistance;
 }
 
 //******************** DeliveryOptimizer functions ****************************

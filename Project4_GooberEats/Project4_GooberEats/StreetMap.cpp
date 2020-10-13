@@ -42,6 +42,7 @@ bool StreetMapImpl::load(string mapFile)
 	string str, name;
 	while (getline(infile, str))
 	{
+		name = str;
 		StreetSegment segment;
 
 		int numSegments = 1;
@@ -111,6 +112,7 @@ bool StreetMapImpl::getSegmentsThatStartWith(const GeoCoord& gc, vector<StreetSe
 	if (m_data->find(gc) == nullptr)
 		return false;
 
+	segs.clear();
 	segs = *(m_data->find(gc));
 	return true;
 }

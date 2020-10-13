@@ -1,0 +1,22 @@
+//Drew Letvin
+//UID: 405382898
+
+StreetMap Functions:
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+load(): O(N) where N is the number of lines in the mapdata file
+
+getSegmentsThatStartWith(): O(N) where N is the number of items contained in the vector returned when 
+searching the ExpandableHashMap. The average case will be rather close to O(1) however because the max of N
+is 4. 
+
+PointToPointRouter Functions:
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+generatePointToPointRoute(): I utilized the A* algorithm to complete this function. To do so I used a priority
+queue of a custom struct called ginfo which contains a geoCoord and some extra information about it. I also used
+tow ExpandableHashMaps, each mapping geoCoords to ginfo structs. 
+
+DeliveryOptimizer Functions:
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+optimizeDeliveryOrder(): O(N) where N is the number of DeliveryRequests in the passed in vector deliveries.
+Since I didn't have time to finish the implementation for this class, it simply goes through the delivery
+ requests and calculates a total crowsDistance.

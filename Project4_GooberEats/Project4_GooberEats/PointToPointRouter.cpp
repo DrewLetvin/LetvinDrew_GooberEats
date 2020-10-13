@@ -1,9 +1,7 @@
 #include "provided.h"
 #include <utility> 
 #include <list>
-#include <set>
 #include <queue> 
-#include <unordered_map>
 #include "ExpandableHashMap.h"
 using namespace std;
 
@@ -21,30 +19,26 @@ public:
 private:
 	const StreetMap* m_map;
 
-	double calcF(GeoCoord startSeg, GeoCoord endSeg, GeoCoord end) const
-	{
-		double g = sqrt(((endSeg.latitude - startSeg.latitude) * (endSeg.latitude - startSeg.latitude)) + ((endSeg.longitude - startSeg.longitude) * (endSeg.longitude - startSeg.longitude)));
-		double h = sqrt(((end.latitude - endSeg.latitude) * (end.latitude - endSeg.latitude)) + ((end.longitude - endSeg.longitude) * (end.longitude - endSeg.longitude)));
-		double f = h + g;
-		return f;
-	}
-
 	struct ginfo
 	{
 		ginfo(GeoCoord geo)
 		{
 			g = geo;
 			f = 0.0;
+			distFromStart = 0.0;
+			h = 0.0;
+			popped = false;
 		}
 
 		GeoCoord g;
 		GeoCoord prev;
 
 		double f;
-		double d;
+		double distFromStart;
 		double h;
 
 		string name;
+		bool popped;
 
 		ginfo() {}
 		~ginfo() {}
@@ -54,9 +48,10 @@ private:
 	{
 		bool operator()(ginfo const& g1, ginfo const& g2)
 		{
-			return g1.f < g2.f;
+			return g1.f > g2.f;
 		}
 	};
+
 };
 
 PointToPointRouterImpl::PointToPointRouterImpl(const StreetMap* sm)
@@ -74,7 +69,6 @@ DeliveryResult PointToPointRouterImpl::generatePointToPointRoute(const GeoCoord&
 	vector<StreetSegment> segs;
 	if (!m_map->getSegmentsThatStartWith(end, segs))
 		return BAD_COORD;
-	segs.clear();
 
 	if(!m_map->getSegmentsThatStartWith(start, segs))
 		return BAD_COORD;
@@ -86,15 +80,30 @@ DeliveryResult PointToPointRouterImpl::generatePointToPointRoute(const GeoCoord&
 	first.prev = start;
 	openList.push(first);
 	inList.associate(start, first);
+	visited.associate(start, first);
 
 	while (!openList.empty())
 	{
 		ginfo q = openList.top();
+		m_map->getSegmentsThatStartWith(q.g, segs);
 		openList.pop();
+		q.popped = true;
 
 		if (q.g == end)
 		{
+			totalDistanceTravelled = q.distFromStart;
+			StreetSegment endpoint(q.prev, q.g, q.name);
+			route.push_front(endpoint);
 			//return path
+			while (q.prev != q.g)
+			{
+				q = *visited.find(q.prev);
+				if (q.prev != q.g)
+				{
+					StreetSegment toAdd(q.prev, q.g, q.name);
+					route.push_front(toAdd);
+				}
+			}
 			return DELIVERY_SUCCESS;
 		}
 
@@ -104,16 +113,26 @@ DeliveryResult PointToPointRouterImpl::generatePointToPointRoute(const GeoCoord&
 			if (visited.find(gSegEnd) == nullptr)
 			{
 				ginfo r(gSegEnd);
-				visited.associate(gSegEnd, r);
-				r.f = calcF(q.g, gSegEnd, end);
+
+				//double g = sqrt(((gSegEnd.latitude - q.g.latitude) * (gSegEnd.latitude - q.g.latitude)) + ((gSegEnd.longitude - q.g.longitude) * (gSegEnd.longitude - q.g.longitude)));
+				//double h = sqrt(((end.latitude - gSegEnd.latitude) * (end.latitude - gSegEnd.latitude)) + ((end.longitude - gSegEnd.longitude) * (end.longitude - gSegEnd.longitude)));
+
+				double g = distanceEarthMiles(q.g, gSegEnd);
+				double h = distanceEarthMiles(gSegEnd, end);
+
+				r.h = h;
+				r.distFromStart = q.distFromStart + g;
+				r.f = r.distFromStart + r.h;
 				r.prev = q.g;
 				r.name = segs[i].name;
+
+				visited.associate(gSegEnd, r);
 
 				if (inList.find(r.g) == nullptr)
 					openList.push(r);
 				else
 				{
-					if (inList.find(r.g)->prev == q.g && inList.find(r.g)->f > r.f)
+					if (inList.find(r.g)->f > r.f)
 					{
 						openList.push(r);
 						inList.associate(r.g, r);
@@ -151,3 +170,17 @@ DeliveryResult PointToPointRouter::generatePointToPointRoute(
 {
     return m_impl->generatePointToPointRoute(start, end, route, totalDistanceTravelled);
 }
+
+
+//int main()
+//{
+//	StreetMap* sm = new StreetMap();
+//	sm->load("D:/UCLA/CS/CS32/LetvinDrew_GooberEats/Project4_GooberEats/Project4_GooberEats/testMap.txt");
+//	PointToPointRouter* router = new PointToPointRouter(sm);
+//
+//	list<StreetSegment> segs;
+//	double distance = 0.0;
+//	GeoCoord a("3", "1");
+//	GeoCoord b("1", "3");
+//	router->generatePointToPointRoute(a, b, segs, distance);
+//}
